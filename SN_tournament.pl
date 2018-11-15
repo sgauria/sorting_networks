@@ -43,7 +43,7 @@ my $tdot_file = "tournament.dot";
 my $tpng_file = "tournament.png";
 open TDOT_FILE, ">$tdot_file";
 
-my $scale_factor = 1;
+my $scale_factor = 0.5;
 sub scl { my ($x) = @_; return ($x * $scale_factor); }
 
 # graph header
@@ -63,8 +63,10 @@ print TDOT_FILE "  }\n";
 foreach $r (0 .. $num_rounds) {
   print TDOT_FILE "  { node [shape=circle width=".&scl(1)." height=".&scl(1)."] rank=same\n";
   foreach $p (@players) {
-    my $lbl_cmnt = $r == 0 ? "[ label=\"${p}\" ]" : "";
-    print TDOT_FILE "    round${r}_player_number_${p} $lbl_cmnt\n";
+    my $lbl_cmnt = 'label="'.($p+1).'"';
+    my $pos_cmnt = ""; # "pos=\"$r,$p\""; # ignored by dot.
+    my $cmnt = join(" ", "[", $pos_cmnt, $lbl_cmnt, "]");
+    print TDOT_FILE "    round${r}_player_number_${p} $cmnt\n";
   }
   print TDOT_FILE "  }\n";
 }
@@ -89,16 +91,16 @@ foreach $rm (@tournament_of_matches) {
     my @match = @{$mm};
     my ($p1, $p2) = @match; 
     print TDOT_FILE "    // match is between ${p1} and ${p2}\n";
-    print TDOT_FILE "    round${sl}_player_number_${p1} -> round_${sl}to${dl}_match_${p1} -> round${dl}_player_number_${p1}\n";
-    print TDOT_FILE "    round${sl}_player_number_${p2} -> round_${sl}to${dl}_match_${p2} -> round${dl}_player_number_${p2}\n";
-    print TDOT_FILE "    round_${sl}to${dl}_match_${p1} -> round_${sl}to${dl}_match_${p2}\n\n";
+    print TDOT_FILE "    round${sl}_player_number_${p1} -> round_${sl}to${dl}_match_${p1} -> round${dl}_player_number_${p1} [weight=10]\n";
+    print TDOT_FILE "    round${sl}_player_number_${p2} -> round_${sl}to${dl}_match_${p2} -> round${dl}_player_number_${p2} [weight=10]\n";
+    print TDOT_FILE "    round_${sl}to${dl}_match_${p1} -> round_${sl}to${dl}_match_${p2} [weight=0]\n\n";
     $player_connected{$p1} = 1; 
     $player_connected{$p2} = 1; 
   }
   foreach $p (@players) { 
     if (not defined $player_connected{$p} or not $player_connected{$p}) {
       print TDOT_FILE "    // ${p} has no match in this round\n";
-      print TDOT_FILE "    round${sl}_player_number_${p} -> round${dl}_player_number_${p}\n\n";
+      print TDOT_FILE "    round${sl}_player_number_${p} -> round${dl}_player_number_${p} [weight=10]\n\n";
     } 
     $player_connected{$p} = 0;
   }
