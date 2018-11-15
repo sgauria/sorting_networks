@@ -43,16 +43,17 @@ my $tdot_file = "tournament.dot";
 my $tpng_file = "tournament.png";
 open TDOT_FILE, ">$tdot_file";
 
+my $scale_factor = 1;
+sub scl { my ($x) = @_; return ($x * $scale_factor); }
+
 # graph header
-print TDOT_FILE <<DONE;
-digraph "tournament" {
-  graph [center=1 rankdir=LR ]
-  edge [dir=none]
-  node [width=0.3 height=0.3 label=""]
-DONE
+print TDOT_FILE "digraph \"tournament\" {\n";
+print TDOT_FILE "  graph [center=1 rankdir=LR ]\n";
+print TDOT_FILE "  edge [dir=none]\n";
+print TDOT_FILE "  node [width=".&scl(0.3)." height=".&scl(0.3)." label=\"\"]\n";
 
 # Space for player names.
-print TDOT_FILE "  { node [shape=rect width=6 height=1] rank=same\n";
+print TDOT_FILE "  { node [shape=rect width=".&scl(6)." height=".&scl(1)."] rank=same\n";
 foreach $p (@players) {
   print TDOT_FILE "    player_name_${p}\n";
 }
@@ -60,7 +61,7 @@ print TDOT_FILE "  }\n";
 
 # Space for player numbers.
 foreach $r (0 .. $num_rounds) {
-  print TDOT_FILE "  { node [shape=circle width=1 height=1] rank=same\n";
+  print TDOT_FILE "  { node [shape=circle width=".&scl(1)." height=".&scl(1)."] rank=same\n";
   foreach $p (@players) {
     my $lbl_cmnt = $r == 0 ? "[ label=\"${p}\" ]" : "";
     print TDOT_FILE "    round${r}_player_number_${p} $lbl_cmnt\n";
