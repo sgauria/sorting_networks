@@ -39,14 +39,19 @@ $Data::Dumper::Maxdepth = 4;
 
 my @players = (0 .. ($num_players - 1));
 my $num_rounds = $#tournament_of_matches + 1;
-my ($rm, $mm, $col, $p, $r);
+my ($rm, $mm, $col, $c, $p, $r);
 
 # Annotate each match with a column number (distinct column within round)
 my @tournament_of_matches_with_col = ();
+my @columns_per_round;
+
+my $current_round = 0;
 foreach $rm (@tournament_of_matches) {
   my @round_of_matches = @{$rm};
-  my @matches_in_each_col = [];
+  my @matches_in_each_col = ();
   push (@tournament_of_matches_with_col, []);
+  $current_round++;
+  $columns_per_round[$current_round] = 0;
   foreach $mm (@round_of_matches) {
     my $col = -1;
     my ($p1, $p2) = @{$mm};
@@ -67,7 +72,10 @@ foreach $rm (@tournament_of_matches) {
         $col = $test_col;
       }
     }
-    if ($col == -1) { $col = $#matches_in_each_col + 1; }
+    if ($col == -1) { 
+      $col = $#matches_in_each_col + 1; 
+      $columns_per_round[$current_round] = $columns_per_round[$current_round] + 1;
+    }
     if ($col > $#matches_in_each_col) {
       $matches_in_each_col[$col] = [];
     }
@@ -76,7 +84,8 @@ foreach $rm (@tournament_of_matches) {
   }
 }
 #print "\n" . Dumper(\@tournament_of_matches) . "\n";
-print "\n" . Dumper(\@tournament_of_matches_with_col) . "\n";
+#print "\n" . Dumper(\@tournament_of_matches_with_col) . "\n";
+#print "\n" . Dumper(\@columns_per_round) . "\n";
 
 # Dot based png version.
 if (0) {
@@ -131,7 +140,7 @@ if (0) {
     print TDOT_FILE "  // Round ${dl}\n";
     print TDOT_FILE "  { edge []\n";
 
-    my %player_connected = {};
+    my %player_connected = ();
     foreach $mm (@round_of_matches) {
       my @match = @{$mm};
       my ($p1, $p2) = @match; 
@@ -176,19 +185,67 @@ if (0) {
 }
 
 # text based version.
+my ($x, $y);
 if (1) {
   my $ttxt_file = "tournament_${num_players}.txt";
   open TTXT_FILE, ">$ttxt_file";
 
   my $canvas_ht = $num_players * 3;
-  my $canvas_wd = $num_rounds  * 12 + 20;
+  my $canvas_wd = 22;
+  foreach $c (@columns_per_round) {
+    if (defined $c) {
+      $canvas_wd += (7 + $c * 3);
+    }
+  }
+
+  # Initialize array to blank
   my @txt_array = ();
-  foreach my $y (0 .. ($canvas_ht-1)) {
+  foreach $y (0 .. ($canvas_ht-1)) {
     $txt_array[$y] = ' ' x $canvas_wd;
   }
 
-  #print @txt_array;
-  #print TTXT_FILE @txt_array;
+
+  # Names and ID (round 0)
+  my $round_x = 0;
+  my $round_w = 22;
+  substr ($txt_array[0], $round_x, $round_w, '| Player Name   |  ID ');
+  foreach $p (@players) {
+    $y = 2 + 3* $p;
+    substr ($txt_array[$y], $round_x, $round_w, ' [            ]---[  ]');
+  }
+  $round_x += $round_w;
+
+  # Basic framework for all rounds (no matches yet)
+  for $r (1 .. $num_rounds) {
+    $c = $columns_per_round[$r];
+    $round_w = 7 + $c*3;
+    substr ($txt_array[0], $round_x, $round_w, " | Round $r ".(' ' x (3*$c + 1 - length($r))));
+    foreach $p (@players) {
+      $y = 2 + 3* $p;
+      substr ($txt_array[$y], $round_x, $round_w, ('---'x$c).'---[  ]');
+    }
+    $round_x += $round_w;
+  }
+
+  my $src_round_num = 0;
+  foreach $rm (@tournament_of_matches) {
+    my @round_of_matches = @{$rm};
+    my $sl = $src_round_num;
+    my $dl = $sl + 1;
+
+    my %player_connected = ();
+    foreach $mm (@round_of_matches) {
+      my @match = @{$mm};
+      my ($p1, $p2) = @match; 
+    }
+
+    $src_round_num++;
+  }
+
+  # Put it in a file.
+  my $final_string = join("\n", @txt_array) . "\n";
+  print $final_string;
+  #print TTXT_FILE @final_string;
   close TTXT_FILE;
 }
 
