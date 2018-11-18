@@ -20,7 +20,10 @@ $num_players //= 8;
 
 # Get the list of matches
 use LWP::Simple;
-my $webpage = `GET http://jgamble.ripco.net/cgi-bin/nw.cgi?inputs=$num_players&algorithm=best&output=text`;
+my $url = 'http://jgamble.ripco.net/cgi-bin/nw.cgi?inputs='.$num_players.'&algorithm=best&output=text';
+#print "$url\n";
+my $webpage = ` GET '$url' `;
+#print $webpage;
 if ($webpage =~ m/(\[\[.*\]\])/s) {
   $webpage = $1;
 }
@@ -254,7 +257,7 @@ if (1) {
 
   # Put it in a file.
   my $final_string = join("\n", @txt_array) . "\n";
-  print $final_string;
+  #print $final_string;
   print TTXT_FILE $final_string;
   close TTXT_FILE;
 }
