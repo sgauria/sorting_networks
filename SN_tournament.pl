@@ -185,17 +185,21 @@ if (0) {
 }
 
 # text based version.
-my ($x, $y);
+my ($x, $y, $y1, $y2);
 if (1) {
   my $ttxt_file = "tournament_${num_players}.txt";
   open TTXT_FILE, ">$ttxt_file";
 
-  my $canvas_ht = $num_players * 3;
-  my $canvas_wd = 22;
-  foreach $c (@columns_per_round) {
-    if (defined $c) {
-      $canvas_wd += (7 + $c * 3);
-    }
+  # Figure out image dimensions.
+  my $canvas_ht = $num_players * 3 + 2;
+  my @round_widths = ();
+  $round_widths[0] = 21;
+  for $r (1 .. $num_rounds) {
+    $round_widths[$r] = (7 + $columns_per_round[$r] * 3);
+  }
+  my $canvas_wd = 0;
+  foreach $x (@round_widths) {
+    $canvas_wd += $x;
   }
 
   # Initialize array to blank
@@ -204,48 +208,54 @@ if (1) {
     $txt_array[$y] = ' ' x $canvas_wd;
   }
 
+  # Mapping
+  sub row_from_player { my ($pp) = @_; return (3 + 3 * $pp); }
+
 
   # Names and ID (round 0)
   my $round_x = 0;
-  my $round_w = 22;
-  substr ($txt_array[0], $round_x, $round_w, '| Player Name   |  ID ');
+  my $round_w = $round_widths[0];
+  substr ($txt_array[1], $round_x, $round_w, '| Player Name   | ID ');
   foreach $p (@players) {
-    $y = 2 + 3* $p;
-    substr ($txt_array[$y], $round_x, $round_w, ' [            ]---[  ]');
+    $y = &row_from_player($p);
+    substr ($txt_array[$y], $round_x, $round_w, ' [            ]--[  ]');
   }
   $round_x += $round_w;
 
   # Basic framework for all rounds (no matches yet)
   for $r (1 .. $num_rounds) {
-    $c = $columns_per_round[$r];
-    $round_w = 7 + $c*3;
-    substr ($txt_array[0], $round_x, $round_w, " | Round $r ".(' ' x (3*$c + 1 - length($r))));
+    $round_w = $round_widths[$r];
+    substr ($txt_array[1], $round_x, $round_w, "| Round $r ".(' ' x ($round_w - 9 - length($r))));
     foreach $p (@players) {
-      $y = 2 + 3* $p;
-      substr ($txt_array[$y], $round_x, $round_w, ('---'x$c).'---[  ]');
+      $y = &row_from_player($p);
+      substr ($txt_array[$y], $round_x, $round_w, ('-' x ($round_w - 7)).'---[  ]');
     }
     $round_x += $round_w;
   }
 
-  my $src_round_num = 0;
-  foreach $rm (@tournament_of_matches) {
-    my @round_of_matches = @{$rm};
-    my $sl = $src_round_num;
-    my $dl = $sl + 1;
-
-    my %player_connected = ();
+  # Add matches on top of that.
+  $round_x = $round_widths[0];
+  for $r (1 .. $num_rounds) {
+    my @round_of_matches = @{$tournament_of_matches_with_col[$r-1]};
     foreach $mm (@round_of_matches) {
       my @match = @{$mm};
-      my ($p1, $p2) = @match; 
+      #print "  @match"."\n";
+      my ($p1, $p2, $c) = @match; 
+      $y1 = &row_from_player($p1);
+      $y2 = &row_from_player($p2);
+      $x = $round_x + 3 + $c * 3;
+      foreach $y ($y1 .. $y2) {
+        substr ($txt_array[$y], $x, 1, (($y == $y1 || $y == $y2) ? "+" : "|"));
+      }
     }
 
-    $src_round_num++;
+    $round_x += $round_widths[$r];
   }
 
   # Put it in a file.
   my $final_string = join("\n", @txt_array) . "\n";
   print $final_string;
-  #print TTXT_FILE @final_string;
+  print TTXT_FILE $final_string;
   close TTXT_FILE;
 }
 
