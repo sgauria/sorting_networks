@@ -11,7 +11,7 @@ A speeded up version of the ladder, where losers move down one position and winn
 
 A managed round-robin tournament where people are ranked and paired (by a judge, or by points) can be ambiguous and subjective.
 
-*A possibly better alternative to all of these is to use a tournament structure based on [Sorting Networks](https://en.wikipedia.org/wiki/Sorting_network).*
+**A possibly better alternative to all of these is to use a tournament structure based on [Sorting Networks](https://en.wikipedia.org/wiki/Sorting_network).**
 It will yield a full ranking of the entrants, and also has a reasonable number of matches for most players.
 The last few rounds are refining the rankings in the middle positions, and could be dropped with little loss 
 (Generally, people don't care too much if they end up 4th out of 8 or 5th out of 8).
