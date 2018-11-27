@@ -21,10 +21,10 @@ The sequence of matches is based on the sequence of comparisons in a sorting net
 
 File | Description
 ---|---
-tournament_8.example.txt |  This is probably the best place to start. Tournament for 8 players, filled out with an example.
-tournament_8.txt  |  Tournament for 8 players.
-tournament_10.txt |  Tournament for 10 players.
-tournament_12.txt |  Tournament for 12 players.
-tournament_14.txt |  Tournament for 14 players.
-tournament_16.txt |  Tournament for 16 players.
-SN_tournament.pl | Code to generate the files above or similar files for different numbers of players. Uses the web interface to Algorithm::Networksort ( http://pages.ripco.net/~jgamble/nw.html ).
+[tournament_8.example.txt](https://raw.githubusercontent.com/sgauria/sorting_networks/master/tournament_8.example.txt) |  This is probably the best place to start. Tournament for 8 players, filled out with an example.
+[tournament_8.txt](https://raw.githubusercontent.com/sgauria/sorting_networks/master/tournament_8.txt)  |  Tournament for 8 players.
+[tournament_10.txt](https://raw.githubusercontent.com/sgauria/sorting_networks/master/tournament_10.txt) |  Tournament for 10 players.
+[tournament_12.txt](https://raw.githubusercontent.com/sgauria/sorting_networks/master/tournament_12.txt) |  Tournament for 12 players.
+[tournament_14.txt](https://raw.githubusercontent.com/sgauria/sorting_networks/master/tournament_14.txt) |  Tournament for 14 players.
+[tournament_16.txt](https://raw.githubusercontent.com/sgauria/sorting_networks/master/tournament_16.txt) |  Tournament for 16 players.
+[SN_tournament.pl](https://github.com/sgauria/sorting_networks/blob/master/SN_tournament.pl) | Code to generate the files above or similar files for different numbers of players. Uses the [web interface to Algorithm::Networksort](http://pages.ripco.net/~jgamble/nw.html).
